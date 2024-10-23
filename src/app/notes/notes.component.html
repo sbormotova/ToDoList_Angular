@@ -1,0 +1,145 @@
+<div class="flex flex-row justify-center gap-32 mt-10 w-full">
+  <app-count-box></app-count-box>
+
+  <textarea
+    #newNote
+    placeholder="add an note"
+    (keyup.enter)="addNote(newNote.value); newNote.value = ''"
+    class="w-1/2 border border-pink-700 focus:border-pink-700 caret-pink-500 rounded-md px-3 text-pink-500 background-red-500 placeholder:text-red-500"
+    id="addNoteInput"
+  ></textarea>
+</div>
+
+<div
+  class="grid sm:grid-cols-1 md:grid-cols-4 gap-2 smflex:space-x-2 mt-2 px-1"
+>
+  <div
+    class="pl-2 pr-1 rounded-md border flex flex-col justify-between shadow-md mt-2 w-full sm:w-auto sm:max-w-96"
+    *ngFor="let note of getNotes(); let indexNote = index"
+    [ngClass]="{
+      'border-pink-700': note.done === false,
+      'border-green-500': note.done === true
+    }"
+  >
+    <div class="flex flex-row justify-between pt-1">
+      <!-- delete 1 btn -->
+      <button
+      [ngClass]="{
+        'border-pink-300 bg-red-300': note.done === false,
+        'border-green-200 bg-green-200': note.done === true
+      }"
+        class="w-4 h-4 self-center rounded-full "
+        (click)="changeDoneStatus(indexNote)"
+      >
+        <img src="../../assets/1828710.png" />
+      </button>
+
+
+      <button
+        class="flex rounded-full hover:bg-gray-300"
+        (click)="dropdownMenu.classList.toggle('hidden')"
+      >
+        ☰
+      </button>
+    </div>
+
+    <div
+      [ngClass]="{
+        'bg-red-100': note.done == false,
+        'bg-green-100': note.done == true
+      }"
+      class="border max-w-32 absolute mt-7 self-end hidden border-gray-500 w-20 text-center"
+      #dropdownMenu
+    >
+      <div class="flex flex-col">
+        <button class="border border-gray-700" (click)="deleteNote(indexNote)">
+          Delete
+        </button>
+        <button
+          class="border border-gray-700"
+          (click)="
+            saveChanges(
+              [costReadonly, descriptionReadonly],
+              [costEditable, descriptionEditable]
+            );
+            dropdownMenu.classList.toggle('hidden')
+          "
+        >
+          {{
+            descriptionEditable.classList.contains("hidden") ? "Edit" : "Save"
+          }}
+        </button>
+      </div>
+    </div>
+
+    <textarea
+      #descriptionEditable
+      class="hidden"
+      [(ngModel)]="note.description"
+      type="text"
+    ></textarea>
+    <div #descriptionReadonly class="text-wrap break-all whitespace-pre">
+      {{ note.description }}
+    </div>
+
+    <div class="flex justify-between py-1 text-xs text-stone-500">
+      <div class="flex flex-start gap-1">
+        <input
+          #costEditable
+          class="hidden w-16"
+          [(ngModel)]="note.cost"
+          type="number"
+        />
+        <p #costReadonly>
+          {{ note.cost | number : "1.0-2" }}
+        </p>
+
+        <button
+          class="flex rounded-full hover:bg-gray-300"
+          (click)="dropdownMenuCurrency.classList.toggle('hidden')"
+        >
+          {{ note.currency }}
+        </button>
+      </div>
+
+      <div
+        class="absolute border max-w-10 ml-16 self-end hidden border-gray-500 w-20 text-center"
+        #dropdownMenuCurrency
+      >
+        <div class="flex flex-col bg-gray-200">
+          <button
+            class="border border-gray-500"
+            (click)="
+              editCurrency(indexNote, '₽');
+              dropdownMenuCurrency.classList.toggle('hidden')
+            "
+          >
+            ₽
+          </button>
+          <button
+            class="border border-gray-500"
+            (click)="
+              editCurrency(indexNote, '€');
+              dropdownMenuCurrency.classList.toggle('hidden')
+            "
+          >
+            €
+          </button>
+          <button
+            class="border border-gray-500"
+            (click)="
+              editCurrency(indexNote, '$');
+              dropdownMenuCurrency.classList.toggle('hidden')
+            "
+          >
+            $
+          </button>
+        </div>
+      </div>
+
+      <p>
+        {{ note.createdDate | date : "dd MMM yyyy, HH:mm" }}
+      </p>
+    </div>
+  </div>
+</div>
